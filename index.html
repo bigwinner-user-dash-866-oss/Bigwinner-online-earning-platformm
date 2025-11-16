@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BigWinner</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{--primary:#e56b6b;--bg:#f5f2f2;}
+    *{font-family:Inter, sans-serif;box-sizing:border-box}
+    body{margin:0;background:var(--bg);padding:18px;}
+
+    .topbar{background:var(--primary);color:#fff;padding:16px;border-radius:12px;
+      display:flex;justify-content:space-between;align-items:center;}
+    .brand{display:flex;gap:10px;align-items:center}
+    .logo{width:50px;height:50px;background:white;color:var(--primary);
+      font-size:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;}
+
+    .box{background:white;padding:16px;border-radius:12px;margin-top:20px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.1);}
+    .members{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+    .member-btn{padding:14px;border-radius:10px;border:1px solid #ddd;
+      font-size:18px;font-weight:700;background:white;cursor:pointer;
+      text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+
+    #userDashboardModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.38);
+      padding:22px;overflow:auto;z-index:999;}
+
+    .badge{background:#ff3b3b;color:#fff;border-radius:999px;padding:2px 8px;
+      font-size:12px;margin-left:6px;}
+
+    .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .card{background:#e56b6b;color:white;padding:22px;border-radius:20px}
+
+    /* ⭐ ADMIN CHAT CSS */
+    #adminChatContainer{
+      display:flex;
+      gap:20px;
+      margin-top:25px;
+      background:white;
+      padding:20px;
+      border-radius:14px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    .conv-btn{background:#ffe3e3;padding:12px;border-radius:10px;margin-bottom:10px;cursor:pointer;}
+  </style>
+</head>
+
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div>
+        <div id="titleLink" style="font-size:22px;font-weight:800;cursor:pointer;">BIGWINNER</div>
+        <div style="font-size:12px;">EVERYONE MAKES MONEY</div>
+      </div>
+    </div>
+
+    <div id="adminNotifyWrap"></div>
+  </div>
+
+  <!-- PUBLIC USER LIST -->
+  <div class="box">
+    <h2>Members</h2>
+    <div class="members" id="publicList"></div>
+
+    <p style="font-size:13px;opacity:0.7;margin-top:12px;">
+      Admin: Click <b>BIGWINNER</b> 8 times to login.
+    </p>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="box" style="display:none;margin-top:20px;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>Add Member</h3>
+
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div id="adminUnreadBadge" class="badge" style="display:none;">0</div>
+        <div onclick="openNotifications()" style="cursor:pointer;font-size:24px;">🔔</div>
+      </div>
+    </div>
+
+    <input id="newUser" placeholder="Username"><br><br>
+    <input id="acc" placeholder="Account No"><br><br>
+    <input id="ifsc" placeholder="IFSC"><br><br>
+
+    <!-- USER PASSWORD -->
+    <input id="userPass" placeholder="Set User Password"><br><br>
+
+    <input id="commission" placeholder="Commission %"><br><br>
+    <input id="teamPeopleInput" placeholder="Team People"><br><br>
+    <input id="teamWorkerInput" placeholder="Team Worker"><br><br>
+
+    <input id="tIncome" placeholder="Income Today"><br><br>
+    <input id="yIncome" placeholder="Income Yesterday"><br><br>
+    <input id="turnover" placeholder="Turnover Today"><br><br>
+    <input id="turnoverYesterday" placeholder="Turnover Yesterday"><br><br>
+
+    <input id="wageOwn" placeholder="Total Withdrawal"><br><br>
+    <input id="wageTeam" placeholder="Security Deposit"><br><br>
+    <input id="wallet" placeholder="Wallet"><br><br>
+
+    <button onclick="addMember()">Add</button>
+    <button onclick="loadAdminList()">Refresh</button>
+    <button onclick="logoutAdmin()">Logout</button>
+
+    <h3 style="margin-top:14px;">All Members</h3>
+    <div id="userList"></div>
+
+    <div id="adminEdit" style="display:none;margin-top:20px;"></div>
+
+    <!-- ⭐ ADMIN CHAT UI -->
+    <div id="adminChatContainer" hidden>
+
+      <!-- LEFT SIDE -->
+      <div style="width:30%;border-right:1px solid #ddd;padding-right:14px;">
+        <h3>Conversations</h3>
+        <div id="convList" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div style="width:70%;padding-left:14px;">
+
+        <div id="noConversation" style="padding:20px;color:#666;">Select a conversation to reply.</div>
+
+        <div id="chatPanel" hidden>
+          <h3 id="chatWith">Chat</h3>
+
+          <div id="chatHistory"
+            style="height:320px;overflow:auto;background:#fff7f7;padding:12px;border-radius:10px;">
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:12px;">
+            <input id="replyText" placeholder="Type reply..."
+              style="flex:1;padding:10px;border-radius:8px;border:1px solid #ddd;">
+            <button onclick="sendReply()"
+              style="background:#e56b6b;color:white;border:0;padding:10px 18px;border-radius:8px;">
+              Send
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- USER DASHBOARD -->
+  <div id="userDashboardModal">
+
+    <div style="max-width:900px;margin:40px auto;background:#f2b3b3;border-radius:22px;padding:25px;">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h1 id="udName" style="font-size:32px;font-weight:800;margin:0;">0</h1>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div id="userReplyBadge" class="badge" style="display:none;">0</div>
+          <button onclick="closeUserDashboard()"
+            style="background:white;border:0;padding:10px 18px;border-radius:12px;font-weight:600;">Close</button>
+        </div>
+      </div>
+
+      <!-- Commission + Customer Service -->
+      <div class="card-grid" style="margin-top:20px;">
+        <div class="card">
+          <h2 style="margin:0;">Commission</h2>
+          <div id="udCommission" style="font-size:38px;font-weight:800;margin-top:12px;">0%</div>
+        </div>
+
+        <div class="card" onclick="openChatUser()" style="cursor:pointer;text-align:center;">
+          <h2 style="margin:0;">Customer Service</h2>
+          <p style="margin-top:12px;opacity:0.8;">Tap to chat with admin</p>
+        </div>
+      </div>
+
+      <!-- Income + Turnover -->
+      <div class="card-grid" style="margin-top:20px;">
+        <div class="card">
+          <h2 style="margin:0;">Income</h2>
+          <div id="udIncome" style="font-size:32px;font-weight:800;margin-top:12px;">₹0.00</div>
+          <div id="udIncomeY" style="opacity:0.9;">₹0.00 yesterday</div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin:0;">Turnover</h2>
+          <div id="udTurn" style="font-size:32px;font-weight:800;margin-top:12px;">₹0.00</div>
+          <div id="udTurnY" style="opacity:0.9;">₹0.00 yesterday</div>
+        </div>
+      </div>
+
+      <!-- Withdrawal + Security + ⭐ WALLET -->
+      <div class="card-grid" style="margin-top:20px;grid-template-columns:1fr 1fr;">
+        
+        <div class="card">
+          <h2 style="margin:0;">Total Withdrawal</h2>
+          <div id="udWageOwn" style="font-size:26px;font-weight:700;margin-top:12px;">₹0.00</div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin:0;">Security Deposit</h2>
+          <div id="udWageTeam" style="font-size:26px;font-weight:700;margin-top:12px;">₹0.00</div>
+        </div>
+
+        <!-- ⭐ FULL WIDTH WALLET CARD -->
+        <div class="card" style="grid-column: span 2; text-align:center;">
+          <h2 style="margin:0;">Wallet Balance</h2>
+          <div id="udWallet" style="font-size:30px;font-weight:800;margin-top:12px;">₹0.00</div>
+        </div>
+
+      </div>
+
+      <!-- USER CHAT -->
+      <div id="userChatModal" style="display:none;margin-top:20px;">
+        <div style="background:white;padding:18px;border-radius:14px;">
+          <h3>Support Chat</h3>
+
+          <div id="userChatHistory"
+            style="max-height:300px;overflow:auto;padding:12px;background:#fff7f7;border-radius:10px;">
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <input id="userMsg" placeholder="Type message...">
+            <button onclick="userSendMessage()"
+              style="background:#e56b6b;color:white;border:0;padding:10px 18px;border-radius:10px;">
+              Send
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTIFICATION MODAL -->
+  <div id="notifyModal"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);padding:25px;z-index:9999;">
+    <div style="max-width:700px;margin:auto;background:white;padding:20px;border-radius:20px;">
+      <h2>Notifications</h2>
+      <div id="notifyList" style="margin-top:18px;max-height:300px;overflow:auto;"></div>
+      <button onclick="closeNotifications()"
+        style="margin-top:18px;background:#e56b6b;color:white;border:0;padding:10px 16px;border-radius:10px;">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- JS FILE -->
+  <script src="app.js"></script>
+
+</body>
+</html>
