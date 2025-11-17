@@ -94,7 +94,7 @@ document.getElementById("titleLink").onclick = function(){
   if(adminTap===8){
     adminTap=0;
     let p = prompt("Enter Admin Password");
-    if(p==="865888"){
+    if(p==="Udaya@143"){
       loggedInAsAdmin = true;
       adminPanel.style.display="block";
       loadAdminList();
