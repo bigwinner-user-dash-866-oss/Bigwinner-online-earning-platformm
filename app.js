@@ -51,6 +51,7 @@ const udTurnY = document.getElementById("udTurnY");
 const udWageOwn = document.getElementById("udWageOwn");
 const udWageTeam = document.getElementById("udWageTeam");
 const udWallet = document.getElementById("udWallet");
+const udTrans = document.getElementById("udTrans");  // ⭐ NEW
 
 
 /* -----------------------------------------
@@ -124,7 +125,8 @@ window.addMember = function(){
     turnoverYesterday: turnoverYesterday.value,
     wageOwn: wageOwn.value,
     wageTeam: wageTeam.value,
-    wallet: wallet.value
+    wallet: wallet.value,
+    totalTrans: totalTrans.value   // ⭐ NEW FIELD
   };
 
   db.ref("users/"+name).set(data).then(()=>{
@@ -178,6 +180,7 @@ function openAdminEdit(name){
       <input id="eWageOwn" value="${d.wageOwn}"><br><br>
       <input id="eWageTeam" value="${d.wageTeam}"><br><br>
       <input id="eWallet" value="${d.wallet}"><br><br>
+      <input id="eTotalTrans" value="${d.totalTrans || 0}"><br><br>
 
       <button onclick="saveEdit()">Save</button>
       <button onclick="deleteMember()">Delete</button>
@@ -200,7 +203,8 @@ window.saveEdit=function(){
     turnoverYesterday:eTurnoverY.value,
     wageOwn:eWageOwn.value,
     wageTeam:eWageTeam.value,
-    wallet:eWallet.value
+    wallet:eWallet.value,
+    totalTrans:eTotalTrans.value   // ⭐ NEW SAVE
   };
 
   db.ref("users/"+editingUser).update(p).then(()=>{
@@ -248,9 +252,10 @@ function openUserDashboard(name){
     udTurnY.textContent=INR(d.turnoverYesterday)+" yesterday";
     udWageOwn.textContent=INR(d.wageOwn);
     udWageTeam.textContent=INR(d.wageTeam);
-
-    /* ⭐ WALLET LINKING */
     udWallet.textContent = INR(d.wallet);
+
+    // ⭐ NEW TOTAL TRANSACTION LINK
+    udTrans.textContent = INR(d.totalTrans);
 
     userDashboardModal.style.display="block";
 
@@ -390,7 +395,7 @@ function refreshConvList(){
 
 
 /* -----------------------------------------
-   OPEN CONVERSATION (FIXED)
+   OPEN CONVERSATION
 ----------------------------------------- */
 function openConversation(id){
   currentConversationId=id;
@@ -469,4 +474,4 @@ function startUserRealtimeListeners(user){
     userReplyBadge.style.display=c>0?"inline-block":"none";
     userReplyBadge.textContent=c;
   });
-}
+     }
