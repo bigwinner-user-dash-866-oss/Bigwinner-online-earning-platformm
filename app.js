@@ -51,7 +51,23 @@ const udTurnY = document.getElementById("udTurnY");
 const udWageOwn = document.getElementById("udWageOwn");
 const udWageTeam = document.getElementById("udWageTeam");
 const udWallet = document.getElementById("udWallet");
-const udTrans = document.getElementById("udTrans");  // ⭐ NEW
+const udTrans = document.getElementById("udTrans");
+
+const newUser = document.getElementById("newUser");
+const acc = document.getElementById("acc");
+const ifsc = document.getElementById("ifsc");
+const userPass = document.getElementById("userPass");
+const commission = document.getElementById("commission");
+const teamPeopleInput = document.getElementById("teamPeopleInput");
+const teamWorkerInput = document.getElementById("teamWorkerInput");
+const tIncome = document.getElementById("tIncome");
+const yIncome = document.getElementById("yIncome");
+const turnover = document.getElementById("turnover");
+const turnoverYesterday = document.getElementById("turnoverYesterday");
+const wageOwn = document.getElementById("wageOwn");
+const wageTeam = document.getElementById("wageTeam");
+const wallet = document.getElementById("wallet");
+const totalTrans = document.getElementById("totalTrans");
 
 
 /* -----------------------------------------
@@ -95,7 +111,7 @@ document.getElementById("titleLink").onclick = function(){
   if(adminTap===8){
     adminTap=0;
     let p = prompt("Enter Admin Password");
-    if(p==="Udaya@010143"){
+    if(p==="865888"){
       loggedInAsAdmin = true;
       adminPanel.style.display="block";
       loadAdminList();
@@ -126,7 +142,7 @@ window.addMember = function(){
     wageOwn: wageOwn.value,
     wageTeam: wageTeam.value,
     wallet: wallet.value,
-    totalTrans: totalTrans.value   // ⭐ NEW FIELD
+    totalTrans: totalTrans.value
   };
 
   db.ref("users/"+name).set(data).then(()=>{
@@ -141,6 +157,7 @@ window.addMember = function(){
    LOAD ADMIN USER LIST
 ----------------------------------------- */
 function loadAdminList(){
+  let userList = document.getElementById("userList");
   userList.innerHTML = "";
   db.ref("users").once("value").then(snap=>{
     if(!snap.exists()) return;
@@ -156,10 +173,11 @@ function loadAdminList(){
 
 
 /* -----------------------------------------
-   EDIT USER
+   OPEN ADMIN EDIT
 ----------------------------------------- */
 function openAdminEdit(name){
   editingUser=name;
+  const adminEdit=document.getElementById("adminEdit");
   adminEdit.style.display="block";
 
   db.ref("users/"+name).once("value").then(snap=>{
@@ -167,44 +185,48 @@ function openAdminEdit(name){
 
     adminEdit.innerHTML = `
       <h3>Edit: ${name}</h3>
-      <input id="eAcc" value="${d.account}"><br><br>
-      <input id="eIfsc" value="${d.ifsc}"><br><br>
-      <input id="ePass" value="${d.password}"><br><br>
-      <input id="eCommission" value="${d.commission}"><br><br>
-      <input id="eTeamPeople" value="${d.teamPeople}"><br><br>
-      <input id="eTeamWorker" value="${d.teamWorker}"><br><br>
-      <input id="eTIncome" value="${d.tIncome}"><br><br>
-      <input id="eYIncome" value="${d.yIncome}"><br><br>
-      <input id="eTurnover" value="${d.turnover}"><br><br>
-      <input id="eTurnoverY" value="${d.turnoverYesterday}"><br><br>
-      <input id="eWageOwn" value="${d.wageOwn}"><br><br>
-      <input id="eWageTeam" value="${d.wageTeam}"><br><br>
-      <input id="eWallet" value="${d.wallet}"><br><br>
-      <input id="eTotalTrans" value="${d.totalTrans || 0}"><br><br>
+      <input id="eAcc" placeholder="Account No" value="${d.account||''}"><br><br>
+      <input id="eIfsc" placeholder="IFSC" value="${d.ifsc||''}"><br><br>
+      <input id="ePass" placeholder="Password" value="${d.password||''}"><br><br>
+      <input id="eCommission" placeholder="Commission %" value="${d.commission||''}"><br><br>
+      <input id="eTeamPeople" placeholder="Team People" value="${d.teamPeople||''}"><br><br>
+      <input id="eTeamWorker" placeholder="Team Worker" value="${d.teamWorker||''}"><br><br>
+      <input id="eTIncome" placeholder="Today Income" value="${d.tIncome||0}"><br><br>
+      <input id="eYIncome" placeholder="Yesterday Income" value="${d.yIncome||0}"><br><br>
+      <input id="eTurnover" placeholder="Today Turnover" value="${d.turnover||0}"><br><br>
+      <input id="eTurnoverY" placeholder="Yesterday Turnover" value="${d.turnoverYesterday||0}"><br><br>
+      <input id="eWageOwn" placeholder="Total Withdrawal" value="${d.wageOwn||0}"><br><br>
+      <input id="eWageTeam" placeholder="Security Deposit" value="${d.wageTeam||0}"><br><br>
+      <input id="eWallet" placeholder="Wallet" value="${d.wallet||0}"><br><br>
+      <input id="eTotalTrans" placeholder="Total Transaction" value="${d.totalTrans||0}"><br><br>
 
       <button onclick="saveEdit()">Save</button>
       <button onclick="deleteMember()">Delete</button>
-      <button onclick="adminEdit.style.display='none'">Close</button>
+      <button onclick='document.getElementById("adminEdit").style.display="none"'>Close</button>
     `;
   });
 }
 
+
+/* -----------------------------------------
+   SAVE EDIT
+----------------------------------------- */
 window.saveEdit=function(){
-  let p={
-    account:eAcc.value,
-    ifsc:eIfsc.value,
-    password:ePass.value,
-    commission:eCommission.value,
-    teamPeople:eTeamPeople.value,
-    teamWorker:eTeamWorker.value,
-    tIncome:eTIncome.value,
-    yIncome:eYIncome.value,
-    turnover:eTurnover.value,
-    turnoverYesterday:eTurnoverY.value,
-    wageOwn:eWageOwn.value,
-    wageTeam:eWageTeam.value,
-    wallet:eWallet.value,
-    totalTrans:eTotalTrans.value   // ⭐ NEW SAVE
+  const p={
+    account: eAcc.value,
+    ifsc: eIfsc.value,
+    password: ePass.value,
+    commission: eCommission.value,
+    teamPeople: eTeamPeople.value,
+    teamWorker: eTeamWorker.value,
+    tIncome: eTIncome.value,
+    yIncome: eYIncome.value,
+    turnover: eTurnover.value,
+    turnoverYesterday: eTurnoverY.value,
+    wageOwn: eWageOwn.value,
+    wageTeam: eWageTeam.value,
+    wallet: eWallet.value,
+    totalTrans: eTotalTrans.value
   };
 
   db.ref("users/"+editingUser).update(p).then(()=>{
@@ -212,10 +234,14 @@ window.saveEdit=function(){
     loadAdminList();
     loadPublicList();
   });
-}
+};
 
+
+/* -----------------------------------------
+   DELETE MEMBER
+----------------------------------------- */
 window.deleteMember=function(){
-  if(!confirm("Delete?"))return;
+  if(!confirm("Delete?")) return;
   db.ref("users/"+editingUser).remove().then(()=>{
     alert("Deleted");
     loadAdminList();
@@ -228,8 +254,7 @@ window.deleteMember=function(){
    USER LOGIN
 ----------------------------------------- */
 function userLogin(name){
-  let p=prompt("Enter password");
-
+  let p = prompt("Enter password");
   db.ref("users/"+name+"/password").once("value").then(snap=>{
     if(p!==snap.val()) return alert("Wrong password");
     openUserDashboard(name);
@@ -238,11 +263,11 @@ function userLogin(name){
 
 
 /* -----------------------------------------
-   USER DASHBOARD OPEN
+   OPEN USER DASHBOARD
 ----------------------------------------- */
 function openUserDashboard(name){
   db.ref("users/"+name).once("value").then(snap=>{
-    let d = snap.val();
+    let d=snap.val();
 
     udName.textContent=name;
     udCommission.textContent=d.commission+"%";
@@ -252,13 +277,10 @@ function openUserDashboard(name){
     udTurnY.textContent=INR(d.turnoverYesterday)+" yesterday";
     udWageOwn.textContent=INR(d.wageOwn);
     udWageTeam.textContent=INR(d.wageTeam);
-    udWallet.textContent = INR(d.wallet);
-
-    // ⭐ NEW TOTAL TRANSACTION LINK
-    udTrans.textContent = INR(d.totalTrans);
+    udWallet.textContent=INR(d.wallet);
+    udTrans.textContent=INR(d.totalTrans);
 
     userDashboardModal.style.display="block";
-
     startUserRealtimeListeners(name);
   });
 }
@@ -273,22 +295,23 @@ window.closeUserDashboard=()=>{
    USER SEND MESSAGE
 ----------------------------------------- */
 window.userSendMessage=function(){
-  let msg=userMsg.value.trim();
-  if(!msg)return;
+  let m=document.getElementById("userMsg").value.trim();
+  if(!m) return;
 
   db.ref("messages").push({
     user:udName.textContent,
-    text:msg,
+    text:m,
     time:nowStr(),
     adminRead:false
   });
 
-  userMsg.value="";
+  document.getElementById("userMsg").value="";
+  loadUserChat();
 };
 
 
 /* -----------------------------------------
-   USER CHAT OPEN
+   USER OPEN CHAT
 ----------------------------------------- */
 window.openChatUser=function(){
   userChatModal.style.display="block";
@@ -296,13 +319,13 @@ window.openChatUser=function(){
 }
 
 function loadUserChat(){
-  let u = udName.textContent;
+  let u=udName.textContent;
   userChatHistory.innerHTML="";
 
   db.ref("messages").orderByChild("user").equalTo(u).once("value")
   .then(snap=>{
     snap.forEach(c=>{
-      let d = c.val();
+      let d=c.val();
 
       userChatHistory.innerHTML+=`
         <p><b>You:</b> ${d.text}</p>
@@ -353,7 +376,7 @@ window.closeNotifications=()=>notifyModal.style.display="none";
 
 
 /* -----------------------------------------
-   REALTIME ADMIN NOTIFICATION LISTENER
+   REALTIME ADMIN LISTENER
 ----------------------------------------- */
 function startRealtimeNotificationListener(){
   db.ref("messages").on("value", snap=>{
@@ -377,7 +400,7 @@ function updateUnread(){
 
 
 /* -----------------------------------------
-   LOAD ADMIN LEFT CONVERSATION LIST
+   CONVERSATION LIST
 ----------------------------------------- */
 function refreshConvList(){
   convList.innerHTML="";
@@ -395,7 +418,7 @@ function refreshConvList(){
 
 
 /* -----------------------------------------
-   OPEN CONVERSATION
+   OPEN ADMIN CHAT
 ----------------------------------------- */
 function openConversation(id){
   currentConversationId=id;
@@ -408,14 +431,14 @@ function openConversation(id){
   chatWith.textContent=c.user;
 
   db.ref("messages/"+id).update({adminRead:true});
-  loadChat(id);
+  loadAdminChat(id);
 }
 
 
 /* -----------------------------------------
-   LOAD CHAT HISTORY
+   LOAD ADMIN CHAT
 ----------------------------------------- */
-function loadChat(id){
+function loadAdminChat(id){
   chatHistory.innerHTML="";
 
   db.ref("messages/"+id).once("value").then(snap=>{
@@ -443,7 +466,7 @@ function loadChat(id){
    ADMIN SEND REPLY
 ----------------------------------------- */
 window.sendReply=function(){
-  if(!currentConversationId)return;
+  if(!currentConversationId) return;
 
   let txt=replyText.value.trim();
   if(!txt)return;
@@ -455,7 +478,7 @@ window.sendReply=function(){
   });
 
   replyText.value="";
-  loadChat(currentConversationId);
+  loadAdminChat(currentConversationId);
 };
 
 
@@ -468,10 +491,10 @@ function startUserRealtimeListeners(user){
     snap.forEach(e=>{
       let rep=e.val().replies||{};
       Object.values(rep).forEach(r=>{
-        if(r.from==="admin")c++;
+        if(r.from==="admin") c++;
       });
     });
     userReplyBadge.style.display=c>0?"inline-block":"none";
     userReplyBadge.textContent=c;
   });
-     }
+   }
