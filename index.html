@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BigWinner</title>
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Your internal CSS -->
   <style>
     :root{--primary:#e56b6b;--bg:#f5f2f2;}
     *{font-family:Inter, sans-serif;box-sizing:border-box}
@@ -41,10 +39,6 @@
     }
     .conv-btn{background:#ffe3e3;padding:12px;border-radius:10px;margin-bottom:10px;cursor:pointer;}
   </style>
-
-  <!-- Your external CSS must be last -->
-  <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -65,6 +59,9 @@
   <div class="box">
     <h2>Members</h2>
     <div class="members" id="publicList"></div>
+    <p style="font-size:13px;opacity:0.7;margin-top:12px;">
+      Admin: Click <b>BIGWINNER</b> 8 times to login.
+    </p>
   </div>
 
   <!-- ADMIN PANEL -->
@@ -85,15 +82,19 @@
     <input id="teamPeopleInput" placeholder="Team People"><br><br>
     <input id="teamWorkerInput" placeholder="Team Worker"><br><br>
 
+    <!-- ⭐ UPDATED TODAY / YESTERDAY INCOME -->
     <input id="tIncome" placeholder="Today Income"><br><br>
     <input id="yIncome" placeholder="Yesterday Income"><br><br>
 
+    <!-- ⭐ UPDATED TODAY / YESTERDAY TURNOVER -->
     <input id="turnover" placeholder="Today Turnover"><br><br>
     <input id="turnoverYesterday" placeholder="Yesterday Turnover"><br><br>
 
     <input id="wageOwn" placeholder="Total Withdrawal"><br><br>
     <input id="wageTeam" placeholder="Security Deposit"><br><br>
     <input id="wallet" placeholder="Wallet"><br><br>
+
+    <!-- ⭐ TOTAL TRANSACTION -->
     <input id="totalTrans" placeholder="Total Transaction"><br><br>
 
     <button onclick="addMember()">Add</button>
@@ -104,11 +105,13 @@
     <div id="userList"></div>
     <div id="adminEdit" style="display:none;margin-top:20px;"></div>
 
+    <!-- ADMIN CHAT UI -->
     <div id="adminChatContainer" hidden>
       <div style="width:30%;border-right:1px solid #ddd;padding-right:14px;">
         <h3>Conversations</h3>
         <div id="convList" style="margin-top:10px;"></div>
       </div>
+
       <div style="width:70%;padding-left:14px;">
         <div id="noConversation" style="padding:20px;color:#666;">Select a conversation to reply.</div>
         <div id="chatPanel" hidden>
@@ -141,52 +144,89 @@
         </div>
       </div>
 
+      <!-- Commission + Customer Service -->
       <div class="card-grid" style="margin-top:20px;">
         <div class="card">
-          <h2>Commission</h2>
+          <h2 style="margin:0;">Commission</h2>
           <div id="udCommission" style="font-size:38px;font-weight:800;margin-top:12px;">0%</div>
         </div>
+
         <div class="card" onclick="openChatUser()" style="cursor:pointer;text-align:center;">
-          <h2>Customer Service</h2>
+          <h2 style="margin:0;">Customer Service</h2>
           <p style="margin-top:12px;opacity:0.8;">Tap to chat with admin</p>
         </div>
       </div>
 
+      <!-- ⭐ UPDATED TODAY INCOME + TODAY TURNOVER -->
       <div class="card-grid" style="margin-top:20px;">
         <div class="card">
-          <h2>Today Income</h2>
+          <h2 style="margin:0;">Today Income</h2>
           <div id="udIncome" style="font-size:32px;font-weight:800;margin-top:12px;">₹0.00</div>
           <div id="udIncomeY" style="opacity:0.9;">₹0.00 yesterday</div>
         </div>
+
         <div class="card">
-          <h2>Today Turnover</h2>
+          <h2 style="margin:0;">Today Turnover</h2>
           <div id="udTurn" style="font-size:32px;font-weight:800;margin-top:12px;">₹0.00</div>
           <div id="udTurnY" style="opacity:0.9;">₹0.00 yesterday</div>
         </div>
       </div>
 
+      <!-- Withdrawal + Security + Wallet + ⭐ Total Transaction -->
       <div class="card-grid" style="margin-top:20px;grid-template-columns:1fr 1fr;">
+
         <div class="card">
-          <h2>Total Withdrawal</h2>
+          <h2 style="margin:0;">Total Withdrawal</h2>
           <div id="udWageOwn" style="font-size:26px;font-weight:700;margin-top:12px;">₹0.00</div>
         </div>
 
         <div class="card">
-          <h2>Security Deposit</h2>
+          <h2 style="margin:0;">Security Deposit</h2>
           <div id="udWageTeam" style="font-size:26px;font-weight:700;margin-top:12px;">₹0.00</div>
         </div>
 
         <div class="card" style="grid-column: span 2; text-align:center;">
-          <h2>Wallet Balance</h2>
+          <h2 style="margin:0;">Wallet Balance</h2>
           <div id="udWallet" style="font-size:30px;font-weight:800;margin-top:12px;">₹0.00</div>
         </div>
 
         <div class="card" style="grid-column: span 2; text-align:center;">
-          <h2>Total Transaction</h2>
+          <h2 style="margin:0;">Total Transaction</h2>
           <div id="udTrans" style="font-size:28px;font-weight:800;margin-top:12px;">₹0.00</div>
+        </div>
+
+      </div>
+
+      <!-- USER CHAT -->
+      <div id="userChatModal" style="display:none;margin-top:20px;">
+        <div style="background:white;padding:18px;border-radius:14px;">
+          <h3>Support Chat</h3>
+          <div id="userChatHistory"
+            style="max-height:300px;overflow:auto;padding:12px;background:#fff7f7;border-radius:10px;">
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <input id="userMsg" placeholder="Type message...">
+            <button onclick="userSendMessage()"
+              style="background:#e56b6b;color:white;border:0;padding:10px 18px;border-radius:10px;">
+              Send
+            </button>
+          </div>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- NOTIFICATION MODAL -->
+  <div id="notifyModal"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);padding:25px;z-index:9999;">
+    <div style="max-width:700px;margin:auto;background:white;padding:20px;border-radius:20px;">
+      <h2>Notifications</h2>
+      <div id="notifyList" style="margin-top:18px;max-height:300px;overflow:auto;"></div>
+      <button onclick="closeNotifications()"
+        style="margin-top:18px;background:#e56b6b;color:white;border:0;padding:10px 16px;border-radius:10px;">
+        Close
+      </button>
     </div>
   </div>
 
@@ -196,6 +236,5 @@
 
   <!-- JS FILE -->
   <script src="app.js"></script>
-
 </body>
-</html>
+            </html>
