@@ -55,8 +55,21 @@
     <div id="adminNotifyWrap"></div>
   </div>
 
-  <!-- PUBLIC USER LIST -->
-  <div class="box">
+  <!-- PASSWORD LOGIN SECTION - Initially visible -->
+  <div id="passwordLogin" class="box" style="text-align:center; padding:40px;">
+    <h2>Enter Password</h2>
+    <input type="password" id="mainPasswordInput" placeholder="Enter your password" 
+      style="padding:14px; font-size:18px; border-radius:10px; border:1px solid #ddd; width:80%; margin-top:20px;">
+    <br><br>
+    <button onclick="checkPassword()" 
+      style="background:#e56b6b; color:white; border:0; padding:14px 40px; border-radius:12px; font-size:18px; font-weight:600; cursor:pointer;">
+      Login
+    </button>
+    <p id="passwordError" style="color:#ff3b3b; margin-top:15px; display:none;">Wrong password!</p>
+  </div>
+
+  <!-- PUBLIC USER LIST - Initially hidden -->
+  <div id="membersSection" class="box" style="display:none;">
     <h2>Members</h2>
     <div class="members" id="publicList"></div>
   </div>
@@ -234,4 +247,4 @@
   <!-- JS FILE -->
   <script src="app.js"></script>
 </body>
-            </html>
+</html>
