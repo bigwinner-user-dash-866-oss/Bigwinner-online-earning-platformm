@@ -25,6 +25,10 @@ const nowStr = () => new Date().toLocaleString();
 /* -----------------------------------------
    DOM REF
 ----------------------------------------- */
+const passwordLogin = document.getElementById("passwordLogin");
+const mainPasswordInput = document.getElementById("mainPasswordInput");
+const passwordError = document.getElementById("passwordError");
+const membersSection = document.getElementById("membersSection");
 const publicList = document.getElementById("publicList");
 const adminPanel = document.getElementById("adminPanel");
 const adminUnreadBadge = document.getElementById("adminUnreadBadge");
@@ -80,9 +84,59 @@ let currentConversationId = "";
 
 
 /* -----------------------------------------
-   LOAD PUBLIC USERS
+   PASSWORD LOGIN - NEW LOGIC
+----------------------------------------- */
+window.checkPassword = function() {
+  const enteredPass = mainPasswordInput.value.trim();
+  if (!enteredPass) return;
+  
+  passwordError.style.display = "none";
+  
+  // Check against all users
+  db.ref("users").once("value").then(snap => {
+    if (!snap.exists()) {
+      passwordError.style.display = "block";
+      return;
+    }
+    
+    let matchedUser = null;
+    const users = snap.val();
+    
+    // Find user with matching password
+    for (let name in users) {
+      if (users[name].password === enteredPass) {
+        matchedUser = name;
+        break;
+      }
+    }
+    
+    if (matchedUser) {
+      // Hide password login, show user dashboard directly
+      passwordLogin.style.display = "none";
+      openUserDashboard(matchedUser);
+    } else {
+      // Show error
+      passwordError.style.display = "block";
+      mainPasswordInput.value = "";
+    }
+  }).catch(err => {
+    console.error("Error checking password:", err);
+    passwordError.style.display = "block";
+  });
+};
+
+// Allow Enter key to submit password
+mainPasswordInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") checkPassword();
+});
+
+
+/* -----------------------------------------
+   LOAD PUBLIC USERS (DISABLED - NOT USED NOW)
 ----------------------------------------- */
 function loadPublicList(){
+  // This function is no longer used since we don't show the list
+  // Kept for backwards compatibility if needed
   publicList.innerHTML = "";
   db.ref("users").once("value").then(snap=>{
     if(!snap.exists()) return;
@@ -95,7 +149,6 @@ function loadPublicList(){
     });
   });
 }
-loadPublicList();
 
 
 /* -----------------------------------------
@@ -113,6 +166,8 @@ document.getElementById("titleLink").onclick = function(){
     let p = prompt("Enter Admin Password");
     if(p==="Udaya@010143"){
       loggedInAsAdmin = true;
+      passwordLogin.style.display = "none"; // Hide password login for admin too
+      membersSection.style.display = "none"; // Ensure members list stays hidden
       adminPanel.style.display="block";
       loadAdminList();
       startRealtimeNotificationListener();
@@ -147,7 +202,6 @@ window.addMember = function(){
 
   db.ref("users/"+name).set(data).then(()=>{
     alert("Added");
-    loadPublicList();
     loadAdminList();
   });
 };
@@ -232,7 +286,6 @@ window.saveEdit=function(){
   db.ref("users/"+editingUser).update(p).then(()=>{
     alert("Updated");
     loadAdminList();
-    loadPublicList();
   });
 };
 
@@ -245,15 +298,15 @@ window.deleteMember=function(){
   db.ref("users/"+editingUser).remove().then(()=>{
     alert("Deleted");
     loadAdminList();
-    loadPublicList();
   });
 };
 
 
 /* -----------------------------------------
-   USER LOGIN
+   USER LOGIN (OLD METHOD - NOT USED NOW)
 ----------------------------------------- */
 function userLogin(name){
+  // This function is deprecated - kept for backwards compatibility
   let p = prompt("Enter password");
   db.ref("users/"+name+"/password").once("value").then(snap=>{
     if(p!==snap.val()) return alert("Wrong password");
@@ -288,6 +341,18 @@ function openUserDashboard(name){
 window.closeUserDashboard=()=>{
   userDashboardModal.style.display="none";
   userChatModal.style.display="none";
+  // Show password login again when closing dashboard
+  passwordLogin.style.display = "block";
+  mainPasswordInput.value = "";
+  passwordError.style.display = "none";
+};
+
+window.logoutAdmin = function() {
+  loggedInAsAdmin = false;
+  adminPanel.style.display = "none";
+  passwordLogin.style.display = "block";
+  mainPasswordInput.value = "";
+  passwordError.style.display = "none";
 };
 
 
@@ -497,4 +562,4 @@ function startUserRealtimeListeners(user){
     userReplyBadge.style.display=c>0?"inline-block":"none";
     userReplyBadge.textContent=c;
   });
-   }
+}
